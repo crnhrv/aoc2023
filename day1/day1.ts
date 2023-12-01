@@ -24,16 +24,14 @@ function main(input_file: string) {
 
     let j = elements.length;
     for (let i = 0; i <= elements.length; i++) { 
-        
-      if (first && last) {
-        break;
-      }
-        
+      
       const leftElement = elements[i];
       const rightElement = elements[j];
 
       first = !first && !isNaN(Number(leftElement)) ? leftElement : first;
       last = !last && !isNaN(Number(rightElement)) ? rightElement : last;
+
+      if (first && last) break;
 
       for (const key in numbers) {
         const checkLength = key.length;
