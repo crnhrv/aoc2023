@@ -23,7 +23,12 @@ function main(input_file: string) {
     let last = null;
 
     let j = elements.length;
-    for (let i = 0; i <= elements.length; i++) {        
+    for (let i = 0; i <= elements.length; i++) { 
+        
+      if (first && last) {
+        break;
+      }
+        
       const leftElement = elements[i];
       const rightElement = elements[j];
 
