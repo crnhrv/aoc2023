@@ -5,6 +5,8 @@ function main(inputFile: string) {
   const schematic = input.split("\n").map((line) => line.split(""));
 
   const partNumberCount: { [key: string]: number } = {};
+  const partNumberGears: { [key: string] : Set<string>} = {};
+  var allGears = new Set<string>();
 
   for (let y = 0; y < schematic.length; y++) {
     const line = schematic[y];
@@ -12,10 +14,12 @@ function main(inputFile: string) {
       if (isNumber(schematic[y][x])) {
         var currentX = x;
         var nearbySymbols = new Set<string>();
+        var nearbyGears = new Set<string>();
 
         while (isNumber(schematic[y][currentX])) {
-          const adjacentSymbols = getAdjacentSymbols(currentX, y, schematic);
+          const [adjacentSymbols, adjacentGears] = getAdjacentSymbols(currentX, y, schematic);
           nearbySymbols = new Set([...nearbySymbols, ...adjacentSymbols]);
+          nearbyGears = new Set([...nearbyGears, ...adjacentGears]);
           currentX++;
         }
 
@@ -29,28 +33,54 @@ function main(inputFile: string) {
         } else {
           partNumberCount[partNumber] = nearbySymbols.size;
         }
+
+        partNumberGears[`${partNumber}_${y},${x}-${currentX}`] = nearbyGears;
+        var allGears = new Set<string>([...allGears, ...nearbyGears]);
+
         x = currentX;
       }
     }
   }
   
   var answer1 = 0;
+  var answer2 = 0;
+
+
   for (const part in partNumberCount) {
     if (partNumberCount[part] > 0) {
         answer1 += (Number(part) * partNumberCount[part]);
+    }        
+  }
+
+  for (const gear of allGears) {
+    var count = 0
+    var localSum = 1;
+    for (const part in partNumberGears) {
+        const partGears = partNumberGears[part];
+        if (partGears.has(gear)) {
+            localSum *= Number(part.split("_")[0])
+            count++;
+        }
+    }
+    
+    if (count > 1) {
+        answer2 += localSum;
     }
   }
 
   console.log(answer1);
+  console.log(answer2);
 }
 
 function getAdjacentSymbols(
   x: number,
   y: number,
   schematic: string[][]
-): Set<string> {
+): [Set<string>, Set<string>] {
   let symbolChars = /[`!@#$%^&*()_\-+=\[\]{};':"\\|,<>\/?~]/;
   const foundSymbols = new Set<string>();
+  const foundGears = new Set<string>();
+
   const deltas = [
     [+1, 0],
     [-1, 0],
@@ -71,10 +101,14 @@ function getAdjacentSymbols(
 
     if (symbolChars.test(schematic[newY][newX])) {
         foundSymbols.add(`${newX}, ${newY}`);
+
+        if (schematic[newY][newX] == "*") {
+            foundGears.add(`${newX}, ${newY}`)
+        }
     }
   }
 
-  return foundSymbols;
+  return [foundSymbols, foundGears];
 }
 
 function isNumber(char: string): boolean {
