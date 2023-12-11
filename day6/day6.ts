@@ -8,28 +8,9 @@ type Race = {
 ((inputFile: string) => {
   const input = fs.readFileSync(inputFile, "utf8");
   const [timeMetadata, distanceMetadata] = input.split("\n");
-  const times = timeMetadata
-    .split(":")
-    .map((x) => x.trim())[1]
-    .split(" ")
-    .filter(x => x !== "");    
-  const distances = distanceMetadata
-    .split(":")
-    .map((x) => x.trim())[1]
-    .split(" ")
-    .filter(x => x !== "");
-
-  const races: Race[] = [];
-
-  for (let i = 0; i < times.length; i++) {
-    const time = times[i];
-    const recordDistance = distances[i];
-
-    races.push({
-      allowedTime: Number(time),
-      recordDistance: Number(recordDistance),
-    });
-  }
+  const times = parseMetadata(timeMetadata);
+  const distances = parseMetadata(distanceMetadata);
+  const races: Race[] = parseRaces(times, distances);
 
   var totalWays = 1;
   for (const race of races) {
@@ -43,7 +24,7 @@ type Race = {
     totalWays *= waysToBeat;
   }
 
-  console.log(`Part 1: ${totalWays}`);
+  console.log(totalWays);
 
 })("inputp2.txt");
 
@@ -53,4 +34,27 @@ function calculateDistanceTravelled(timeHeld: number, raceTime: number) : number
     const timeLeftInRace = raceTime - timeHeld;
 
     return mmPerSec * timeLeftInRace;
+}
+
+function parseRaces(times: string[], distances: string[]) : Race[] {
+    const races = [];
+    for (let i = 0; i < times.length; i++) {
+        const time = times[i];
+        const recordDistance = distances[i];
+    
+        races.push({
+          allowedTime: Number(time),
+          recordDistance: Number(recordDistance),
+        });
+      }
+
+    return races;
+}
+
+function parseMetadata(metadata: string) {
+    return metadata
+    .split(":")
+    .map((x) => x.trim())[1]
+    .split(" ")
+    .filter(x => x !== "");    
 }
