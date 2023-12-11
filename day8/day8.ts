@@ -40,9 +40,6 @@ type Node = {
         node.right = right;        
     }
 
-    // for (const node of tree.nodes) {
-    //     console.log(node.label, node.left?.label, node.right?.label);
-    // }
 
     var currentNode : Node | undefined  = tree.nodes[0];
     var steps = 0;
