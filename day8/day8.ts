@@ -3,7 +3,7 @@ import * as fs from 'fs';
 type Node = {
     left: Node | undefined
     right: Node | undefined
-    label: string | string[]
+    label: string 
 }
 
 ((inputFile: string) => {
