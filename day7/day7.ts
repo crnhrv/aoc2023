@@ -37,6 +37,7 @@ const HAND_TYPE : {[key: string]: number} = {
     "HIGH-CARD": 0
 };
 
+
 ((inputFile: string, isJokerWildcard: boolean) => {
     const input = fs.readFileSync(inputFile, "utf-8");
     const handsMetadata = input.split("\n").map(x => x.trim().split(" "));
@@ -50,8 +51,7 @@ const HAND_TYPE : {[key: string]: number} = {
         hands.push({ bid: Number(bid), cards, type: handType })
     }
 
-    hands.sort((a, b) => isHandAStrongerThanB(a, b, isJokerWildcard))
-
+    hands.sort((a, b) => compareHands(a, b))
 
     var totalWinnings = 0;
     for (let i = 0; i < hands.length; i++) {
@@ -63,7 +63,7 @@ const HAND_TYPE : {[key: string]: number} = {
     
 })("input.txt", true);
 
-function isHandAStrongerThanB(handA: Hand, handB: Hand, isJokerWildcard: boolean) : number {
+function compareHands(handA: Hand, handB: Hand) : number {
 
     if (HAND_TYPE[handA.type] > HAND_TYPE[handB.type]) {
         return 1;
@@ -93,21 +93,21 @@ function isHandAStrongerThanB(handA: Hand, handB: Hand, isJokerWildcard: boolean
 
 
 function getHandType(hand: Card[], isJokerWildcard: boolean) : string {
-    const [whatOfAKind, count] = isWhatOfAKind(hand, isJokerWildcard);
+    const [somethingOfAKind, count] = isWhatOfAKind(hand, isJokerWildcard);
     
-    if (whatOfAKind == 5) {
+    if (somethingOfAKind == 5) {
         return "FIVE-OAK";
     }
 
-    if (whatOfAKind == 4) {
+    if (somethingOfAKind == 4) {
         return "FOUR-OAK";
     }
 
-    if (whatOfAKind == 3) {
+    if (somethingOfAKind == 3) {
         return isFullHouse(hand, isJokerWildcard) ? "FULL-HOUSE" : "THREE-OAK";
     }
 
-    if (whatOfAKind == 2) {
+    if (somethingOfAKind == 2) {
         return count == 2 ? "TWO-PAIR" : "ONE-PAIR";
     }
 
