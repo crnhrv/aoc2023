@@ -30,34 +30,46 @@ type Node = {
     }
 
     for (const node of tree.nodes) {
-        console.log(node.left?.label.length, node.right?.label.length)
         const left = tree.nodes.find(x => node.left?.label == x.label);
         const right = tree.nodes.find(x => node.right?.label == x.label);
-
-        console.log(left, right)
 
         node.left = left;
         node.right = right;        
     }
 
-
     var currentNode : Node | undefined  = tree.nodes[0];
     var steps = 0;
 
-    while (currentNode != undefined && currentNode.label !== "ZZZ") {
-        var currentInstruction = instructions[steps % instructions.length];
-        if (currentInstruction == "L") {
-            currentNode = currentNode.left;
-        } else {
-            currentNode = currentNode.right;
+    const aNodes = tree.nodes.filter(x => endsWith(x.label, "A"))
+
+    var minSteps : number[] = [];
+
+    for (const node of aNodes) {
+        var steps = 0;
+        currentNode = node;
+        while (currentNode != undefined && !endsWith(currentNode.label, "Z")) {
+            var currentInstruction = instructions[steps % instructions.length];
+            if (currentInstruction == "L") {
+                currentNode = currentNode.left;
+            } else {
+                currentNode = currentNode.right;
+            }
+            steps++;
         }
 
-
-        steps++;
+        minSteps.push(steps)
     }
+   
+    var stepCount = minSteps.reduce((a, b) => (a * b) / gcd(a, b))
 
-    console.log(steps);
+    console.log(stepCount)
 
+})("input.txt")
 
+function gcd(a: number, b: number): number {
+    return !b ? a : gcd(b, a % b);
+}
 
-})("test-input2.txt")
+function endsWith(input: string | string[], target: string) : boolean {
+    return input[input.length - 1] === target
+}
