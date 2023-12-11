@@ -1,10 +1,5 @@
 import * as fs from 'fs';
 
-
-type Tree = {
-    nodes: Node[]
-}
-
 type Node = {
     left: Node | undefined
     right: Node | undefined
@@ -16,34 +11,15 @@ type Node = {
     const lines = input.split("\n");
     const instructions = lines[0].trim().split("");
 
-    const tree : Tree = { nodes: [] };
+    const nodes = parseNodes(lines);
 
-    const metadata = lines.slice(2).map(x => [x.split("=")[0].trim(), x.split("=")[1]]);
-    const treeData = metadata.map(x => [x[0], x[1].replace(/[() ]/g, "").split(",")]);
-    for (const [nodeLabel, children] of treeData) {
-        const node : Node = { left: undefined, right: undefined, label: nodeLabel.toString().trim() };
-
-        node.left = { left: undefined, right: undefined, label: children[0].trim() }
-        node.right = { left: undefined, right: undefined, label: children[1].trim() }
-
-        tree.nodes.push(node);      
-    }
-
-    for (const node of tree.nodes) {
-        const left = tree.nodes.find(x => node.left?.label == x.label);
-        const right = tree.nodes.find(x => node.right?.label == x.label);
-
-        node.left = left;
-        node.right = right;        
-    }
-
-    var currentNode : Node | undefined  = tree.nodes[0];
+    var currentNode : Node | undefined  = nodes[0];
     var steps = 0;
 
-    const aNodes = tree.nodes.filter(x => endsWith(x.label, "A"))
+    const aNodes = nodes.filter(x => endsWith(x.label, "A"))
 
-    var minSteps : number[] = [];
-
+    var aaaSteps = 0;
+    var minGhostSteps = 1
     for (const node of aNodes) {
         var steps = 0;
         currentNode = node;
@@ -57,14 +33,43 @@ type Node = {
             steps++;
         }
 
-        minSteps.push(steps)
+        if (node.label === "AAA") {
+            aaaSteps = steps;
+        }
+
+        minGhostSteps = (steps * minGhostSteps) / gcd(steps, minGhostSteps)
     }
    
-    var stepCount = minSteps.reduce((a, b) => (a * b) / gcd(a, b))
-
-    console.log(stepCount)
+    console.log(`Answer 1: ${aaaSteps}`);
+    console.log(`Answer 2: ${minGhostSteps}`);
 
 })("input.txt")
+
+function parseNodes(lines: string[]) : Node[] {
+    const metadata = lines.slice(2).map(x => [x.split("=")[0].trim(), x.split("=")[1]]);
+    const treeData = metadata.map(x => [x[0], x[1].replace(/[() ]/g, "").split(",")]);
+
+    var nodes = []
+
+    for (const [nodeLabel, children] of treeData) {
+        const node: Node = { left: undefined, right: undefined, label: nodeLabel.toString().trim() };
+
+        node.left = { left: undefined, right: undefined, label: children[0].trim() };
+        node.right = { left: undefined, right: undefined, label: children[1].trim() };
+
+        nodes.push(node);
+    }
+
+    for (const node of nodes) {
+        const left = nodes.find(x => node.left?.label == x.label);
+        const right = nodes.find(x => node.right?.label == x.label);
+
+        node.left = left;
+        node.right = right;
+    }
+
+    return nodes;
+}
 
 function gcd(a: number, b: number): number {
     return !b ? a : gcd(b, a % b);
