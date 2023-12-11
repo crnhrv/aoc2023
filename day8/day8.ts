@@ -12,23 +12,19 @@ type Node = {
     const instructions = lines[0].trim().split("");
 
     const nodes = parseNodes(lines);
-
-    var currentNode : Node | undefined  = nodes[0];
-    var steps = 0;
-
     const aNodes = nodes.filter(x => endsWith(x.label, "A"))
 
     var aaaSteps = 0;
     var minGhostSteps = 1
     for (const node of aNodes) {
         var steps = 0;
-        currentNode = node;
+        var currentNode = node;
         while (currentNode != undefined && !endsWith(currentNode.label, "Z")) {
             var currentInstruction = instructions[steps % instructions.length];
             if (currentInstruction == "L") {
-                currentNode = currentNode.left;
+                currentNode = currentNode.left!;
             } else {
-                currentNode = currentNode.right;
+                currentNode = currentNode.right!;
             }
             steps++;
         }
@@ -44,6 +40,14 @@ type Node = {
     console.log(`Answer 2: ${minGhostSteps}`);
 
 })("input.txt")
+
+function gcd(a: number, b: number): number {
+    return !b ? a : gcd(b, a % b);
+}
+
+function endsWith(input: string | string[], target: string) : boolean {
+    return input[input.length - 1] === target
+}
 
 function parseNodes(lines: string[]) : Node[] {
     const metadata = lines.slice(2).map(x => [x.split("=")[0].trim(), x.split("=")[1]]);
@@ -69,12 +73,4 @@ function parseNodes(lines: string[]) : Node[] {
     }
 
     return nodes;
-}
-
-function gcd(a: number, b: number): number {
-    return !b ? a : gcd(b, a % b);
-}
-
-function endsWith(input: string | string[], target: string) : boolean {
-    return input[input.length - 1] === target
 }
